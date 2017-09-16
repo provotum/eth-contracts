@@ -2,7 +2,7 @@ pragma solidity ^0.4.15;
 
 
 import {SignatureVerificator as SignatureVerificator} from "./SignatureVerificator.sol";
-import {ZkVerificator as ZkVerificator} from "./ZeroKnowledgeVerificator.sol";
+import {ZeroKnowledgeVerificator as ZeroKnowledgeVerificator} from "./ZeroKnowledgeVerificator.sol";
 
 
 /**
@@ -38,12 +38,12 @@ contract Ballot {
 
     SignatureVerificator _signatureVerificator;
 
-    ZkVerificator _zkVerificator;
+    ZeroKnowledgeVerificator _zkVerificator;
 
     /**
      * @param question The question the voters are getting asked.
      */
-    function Ballot(string question, SignatureVerificator signatureVerificator, ZkVerificator zkVerificator) {
+    function Ballot(string question, SignatureVerificator signatureVerificator, ZeroKnowledgeVerificator zkVerificator) {
         _votingIsOpen = false;
 
         _proposal.question = question;
