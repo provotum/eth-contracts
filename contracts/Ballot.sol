@@ -1,7 +1,6 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.18;
 
 
-import {SignatureVerificator as SignatureVerificator} from "./SignatureVerificator.sol";
 import {ZeroKnowledgeVerificator as ZeroKnowledgeVerificator} from "./ZeroKnowledgeVerificator.sol";
 
 
@@ -19,15 +18,15 @@ contract Ballot {
     }
 
     struct Voter {
-    address voter;
-    string vote;
+        address voter;
+        string vote;
     }
 
     struct Proposal {
-    uint nrVoters;
-    mapping (address => bool) voted;
-    Voter[] voters;
-    string question;
+        uint nrVoters;
+        mapping(address => bool) voted;
+        Voter[] voters;
+        string question;
     }
 
     address private _owner;
@@ -36,21 +35,19 @@ contract Ballot {
 
     Proposal private _proposal;
 
-    SignatureVerificator _signatureVerificator;
 
     ZeroKnowledgeVerificator _zkVerificator;
 
     /**
      * @param question The question the voters are getting asked.
      */
-    function Ballot(string question, SignatureVerificator signatureVerificator, ZeroKnowledgeVerificator zkVerificator) {
+    function Ballot(string question, ZeroKnowledgeVerificator zkVerificator) public {
         _votingIsOpen = false;
 
         _proposal.question = question;
         _proposal.voters.length = 0;
         _proposal.nrVoters = 0;
 
-        _signatureVerificator = signatureVerificator;
         _zkVerificator = zkVerificator;
 
         _owner = msg.sender;
@@ -89,12 +86,6 @@ contract Ballot {
         if (hasVoted) {
             VoteResult(msg.sender, false, "Voter already voted");
             return (false, "Voter already voted");
-        }
-
-        bool validSignature = _signatureVerificator.verifySignature(chosenVote);
-        if (!validSignature) {
-            VoteResult(msg.sender, false, "Invalid signature in received vote");
-            return (false, "Invalid Signature in received vote");
         }
 
         bool validZkProof = _zkVerificator.verifyProof(chosenVote);
@@ -144,7 +135,7 @@ contract Ballot {
     /**
      * @dev Destroys this contract. May be called only by the owner of this contract.
      */
-    function destroy() onlyOwner {
+    function destroy() public onlyOwner {
         selfdestruct(_owner);
     }
 

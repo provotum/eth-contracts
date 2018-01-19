@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.18;
 
 
 /**
@@ -14,7 +14,8 @@ contract ZeroKnowledgeVerificator {
 
     address private _owner;
 
-    function ZeroKnowledgeVerificator() {
+
+    function ZeroKnowledgeVerificator() public {
         _owner = msg.sender;
     }
 
@@ -34,7 +35,7 @@ contract ZeroKnowledgeVerificator {
     /**
      * @dev Destroys this contract. May be called only by the owner of this contract.
      */
-    function destroy() onlyOwner {
+    function destroy() public onlyOwner {
         selfdestruct(_owner);
     }
 }

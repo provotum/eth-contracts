@@ -6,12 +6,10 @@ contract('Ballot', function (accounts) {
     var sender = accounts[0];
 
     var zkVerificator = ZeroKnowledgeVerificator.new();
-    var signatureVerificator = SignatureVerificator.new();
-
     var questionToVoteOn = "Do you agree?";
 
     it("the voting question should be the same as submitted on creation", function () {
-        var ballot = Ballot.new(questionToVoteOn, signatureVerificator.address, zkVerificator.address);
+        var ballot = Ballot.new(questionToVoteOn, zkVerificator.address);
 
         return ballot.then(function (instance) {
             // fetch vote
@@ -22,7 +20,7 @@ contract('Ballot', function (accounts) {
     });
 
     it("should not accept any vote before being opened", function () {
-        var ballot = Ballot.new(questionToVoteOn, signatureVerificator.address, zkVerificator.address);
+        var ballot = Ballot.new(questionToVoteOn, zkVerificator.address);
 
         return ballot.then(function (instance) {
             // vote yes before vote has been opened
