@@ -6,6 +6,8 @@ pragma solidity ^0.4.18;
  */
 contract ZeroKnowledgeVerificator {
 
+    event ProofEvent(address indexed _from, bool wasSuccessful, string reason);
+
     modifier onlyOwner {
         require(msg.sender == _owner);
         // code for the function modified is inserted at _
@@ -28,6 +30,7 @@ contract ZeroKnowledgeVerificator {
      */
     function verifyProof(string vote) external constant returns (bool) {
         // TODO: verify proof
+        ProofEvent(msg.sender, true, "Proof was successful");
 
         return true;
     }
