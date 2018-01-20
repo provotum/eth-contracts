@@ -9,7 +9,8 @@ import {ZeroKnowledgeVerificator as ZeroKnowledgeVerificator} from "./ZeroKnowle
 */
 contract Ballot {
 
-    event VoteResult(address indexed _from, bool wasSuccessful, string reason);
+    event VoteEvent(address indexed _from, bool wasSuccessful, string reason);
+    event ChangeEvent(address indexed _from, bool wasSuccessful, string reason);
 
     modifier onlyOwner {
         require(msg.sender == _owner);
@@ -57,6 +58,7 @@ contract Ballot {
      * @dev Opens the voting process. Only the owner of this contract is allowed to call this method.
      */
     function openVoting() external onlyOwner {
+        ChangeEvent(msg.sender, true, "Opened voting");
         _votingIsOpen = true;
     }
 
@@ -64,6 +66,7 @@ contract Ballot {
      * @dev Closes the voting process. Only the owner of this contract is allowed to call this method.
      */
     function closeVoting() external onlyOwner {
+        ChangeEvent(msg.sender, true, "Closed voting");
         _votingIsOpen = false;
     }
 
@@ -77,20 +80,20 @@ contract Ballot {
     function vote(string chosenVote) external returns (bool, string) {
         // check whether voting is still allowed
         if (!_votingIsOpen) {
-            VoteResult(msg.sender, false, "Voting is closed");
+            VoteEvent(msg.sender, false, "Voting is closed");
             return (false, "Voting is closed");
         }
 
         bool hasVoted = _proposal.voted[msg.sender];
         // disallow multiple votes
         if (hasVoted) {
-            VoteResult(msg.sender, false, "Voter already voted");
+            VoteEvent(msg.sender, false, "Voter already voted");
             return (false, "Voter already voted");
         }
 
         bool validZkProof = _zkVerificator.verifyProof(chosenVote);
         if (!validZkProof) {
-            VoteResult(msg.sender, false, "Invalid zero knowledge proof");
+            VoteEvent(msg.sender, false, "Invalid zero knowledge proof");
             return (false, "Invalid zero knowledge proof");
         }
 
@@ -100,7 +103,7 @@ contract Ballot {
 
         _proposal.nrVoters += 1;
 
-        VoteResult(msg.sender, true, "Accepted vote");
+        VoteEvent(msg.sender, true, "Accepted vote");
         return (true, "Accepted vote");
     }
 
@@ -136,6 +139,7 @@ contract Ballot {
      * @dev Destroys this contract. May be called only by the owner of this contract.
      */
     function destroy() public onlyOwner {
+        ChangeEvent(msg.sender, true, "Destroyed contract");
         selfdestruct(_owner);
     }
 
