@@ -28,7 +28,7 @@ contract ZeroKnowledgeVerificator {
      *
      * @return True, if the vote has been verified successfully, false otherwise.
      */
-    function verifyProof(string vote) external constant returns (bool) {
+    function verifyProof(string vote) external returns (bool) {
         // TODO: verify proof
         ProofEvent(msg.sender, true, "Proof was successful");
 
