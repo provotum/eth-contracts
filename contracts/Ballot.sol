@@ -20,7 +20,7 @@ contract Ballot {
 
     struct Voter {
         address voter;
-        string vote;
+        uint8 vote;
     }
 
     struct Proposal {
@@ -73,11 +73,11 @@ contract Ballot {
     /**
      * @dev Votes may only be submitted by the zero-knowledge verification contract.
      *
-     * @param chosenVote A string representing the chosen vote
+     * @param chosenVote A 0/1 representing the chosen vote
      *
      * @return bool, string True if vote is accepted, false otherwise, along with the reason why.
      */
-    function vote(string chosenVote) external returns (bool, string) {
+    function vote(uint8 chosenVote) external returns (bool, string) {
         // check whether voting is still allowed
         if (!_votingIsOpen) {
             VoteEvent(msg.sender, false, "Voting is closed");
@@ -131,7 +131,7 @@ contract Ballot {
      * @return voter The address of the voter.
      * @return vote The corresponding vote.
      */
-    function getVote(uint index) external constant returns (address voter, string vote) {
+    function getVote(uint index) external constant returns (address voter, uint8 vote) {
         return (_proposal.voters[index].voter, _proposal.voters[index].vote);
     }
 
