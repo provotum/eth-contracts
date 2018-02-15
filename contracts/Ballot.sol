@@ -27,7 +27,7 @@ contract Ballot {
         uint nrVoters;
         mapping(address => bool) voted;
         Voter[] voters;
-        bytes32 question;
+        bytes question;
     }
 
     address private _owner;
@@ -42,7 +42,7 @@ contract Ballot {
     /**
      * @param question The question the voters are getting asked.
      */
-    function Ballot(bytes32 question, ZeroKnowledgeVerificator zkVerificator) public {
+    function Ballot(bytes question, ZeroKnowledgeVerificator zkVerificator) public {
         _votingIsOpen = false;
 
         _proposal.question = question;
@@ -112,7 +112,7 @@ contract Ballot {
      *
      * @return question The question to ask voters.
      */
-    function getProposedQuestion() public constant returns (bytes32 question) {
+    function getProposedQuestion() public constant returns (bytes question) {
         question = _proposal.question;
     }
 
