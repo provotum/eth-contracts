@@ -20,7 +20,13 @@ contract Ballot {
 
     struct Voter {
         address voter;
-        uint8 vote;
+        string bigG;
+        string bigH;
+        string p;
+        string y;
+        string z;
+        string s;
+        string c;
     }
 
     struct Proposal {
@@ -71,13 +77,22 @@ contract Ballot {
     }
 
     /**
-     * @dev Votes may only be submitted by the zero-knowledge verification contract.
+     * Consider the ElGamal multiplicative (i.e. additive homomorphic) encryption to be of the form:
      *
-     * @param chosenVote A 0/1 representing the chosen vote
+     *   E(m) = (G, H) = (g^r, h^r * g^m), with h = g^x and m = message
+     *
+     *
+     * @param bigG A string representing G of the ElGamal ciphertext.
+     * @param bigH A string representing H of the ElGamal ciphertext.
+     * @param p    A string representing the prime modulus used in the ciphertext and in the proof.
+     * @param y    A concatenated string of y-values of the proof, delimited by the character Y.
+     * @param z    A concatenated string of z-values of the proof, delimited by the character Z.
+     * @param s    A concatenated string of s-values of the proof, delimited by the character S.
+     * @param c    C concatenated string of c-values of the proof, delimited by the character C.
      *
      * @return bool, string True if vote is accepted, false otherwise, along with the reason why.
      */
-    function vote(uint8 chosenVote) external returns (bool, string) {
+    function vote(string bigG, string bigH, string p, string y, string z, string s, string c) external returns (bool, string) {
         // check whether voting is still allowed
         if (!_votingIsOpen) {
             VoteEvent(msg.sender, false, "Voting is closed");
@@ -97,7 +112,7 @@ contract Ballot {
             return (false, "Invalid zero knowledge proof");
         }
 
-        Voter memory sender = Voter({voter : msg.sender, vote : chosenVote});
+        Voter memory sender = Voter({voter : msg.sender, bigG: bigG, bigH: bigH, p:p, y:y, z:z, s:s, c:c});
         _proposal.voted[msg.sender] = true;
         _proposal.voters.push(sender);
 
@@ -129,10 +144,16 @@ contract Ballot {
      * @dev Returns the vote submitted by the voter at the given index.
      *
      * @return voter The address of the voter.
-     * @return vote The corresponding vote.
+     * @return bigG A string representing G of the ElGamal ciphertext.
+     * @return bigH A string representing H of the ElGamal ciphertext.
+     * @return p    A string representing the prime modulus used in the ciphertext and in the proof.
+     * @return y    A concatenated string of y-values of the proof, delimited by the character Y.
+     * @return z    A concatenated string of z-values of the proof, delimited by the character Z.
+     * @return s    A concatenated string of s-values of the proof, delimited by the character S.
+     * @return c    C concatenated string of c-values of the proof, delimited by the character C.
      */
-    function getVote(uint index) external constant returns (address voter, uint8 vote) {
-        return (_proposal.voters[index].voter, _proposal.voters[index].vote);
+    function getVote(uint index) external constant returns (address voter, string bigG, string bigH, string p, string y, string z, string s, string c) {
+        return (_proposal.voters[index].voter, _proposal.voters[index].bigG, _proposal.voters[index].bigH, _proposal.voters[index].p, _proposal.voters[index].y, _proposal.voters[index].z, _proposal.voters[index].s, _proposal.voters[index].c);
     }
 
     /**
