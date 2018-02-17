@@ -20,13 +20,8 @@ contract Ballot {
 
     struct Voter {
         address voter;
-        string bigG;
-        string bigH;
-        string p;
-        string y;
-        string z;
-        string s;
-        string c;
+        string ciphertext;
+        string proof;
     }
 
     struct Proposal {
@@ -81,18 +76,15 @@ contract Ballot {
      *
      *   E(m) = (G, H) = (g^r, h^r * g^m), with h = g^x and m = message
      *
+     * @dev Note, this function does not assume anything about how the ciphertext resp. the proof
+     * is actually represented. This is the domain of the caller.
      *
-     * @param bigG A string representing G of the ElGamal ciphertext.
-     * @param bigH A string representing H of the ElGamal ciphertext.
-     * @param p    A string representing the prime modulus used in the ciphertext and in the proof.
-     * @param y    A concatenated string of y-values of the proof, delimited by the character Y.
-     * @param z    A concatenated string of z-values of the proof, delimited by the character Z.
-     * @param s    A concatenated string of s-values of the proof, delimited by the character S.
-     * @param c    C concatenated string of c-values of the proof, delimited by the character C.
+     * @param ciphertext   The ciphertext, i.e. a string representing (G, H)
+     * @param proof        The corresponding membership proof.
      *
      * @return bool, string True if vote is accepted, false otherwise, along with the reason why.
      */
-    function vote(string bigG, string bigH, string p, string y, string z, string s, string c) external returns (bool, string) {
+    function vote(string ciphertext, string proof) external returns (bool, string) {
         // check whether voting is still allowed
         if (!_votingIsOpen) {
             VoteEvent(msg.sender, false, "Voting is closed");
@@ -106,19 +98,19 @@ contract Ballot {
             return (false, "Voter already voted");
         }
 
-        bool validZkProof = _zkVerificator.verifyProof(chosenVote);
+        bool validZkProof = _zkVerificator.verifyProof(proof);
         if (!validZkProof) {
             VoteEvent(msg.sender, false, "Invalid zero knowledge proof");
             return (false, "Invalid zero knowledge proof");
         }
 
-        Voter memory sender = Voter({voter : msg.sender, bigG: bigG, bigH: bigH, p:p, y:y, z:z, s:s, c:c});
         _proposal.voted[msg.sender] = true;
-        _proposal.voters.push(sender);
+        _proposal.voters.push(Voter({voter : msg.sender, ciphertext : ciphertext, proof : proof}));
 
         _proposal.nrVoters += 1;
 
         VoteEvent(msg.sender, true, "Accepted vote");
+
         return (true, "Accepted vote");
     }
 
@@ -143,17 +135,12 @@ contract Ballot {
     /**
      * @dev Returns the vote submitted by the voter at the given index.
      *
-     * @return voter The address of the voter.
-     * @return bigG A string representing G of the ElGamal ciphertext.
-     * @return bigH A string representing H of the ElGamal ciphertext.
-     * @return p    A string representing the prime modulus used in the ciphertext and in the proof.
-     * @return y    A concatenated string of y-values of the proof, delimited by the character Y.
-     * @return z    A concatenated string of z-values of the proof, delimited by the character Z.
-     * @return s    A concatenated string of s-values of the proof, delimited by the character S.
-     * @return c    C concatenated string of c-values of the proof, delimited by the character C.
+     * @return voter        The address of the voter.
+     * @return ciphertext   The ciphertext.
+     * @return proof        The proof.
      */
-    function getVote(uint index) external constant returns (address voter, string bigG, string bigH, string p, string y, string z, string s, string c) {
-        return (_proposal.voters[index].voter, _proposal.voters[index].bigG, _proposal.voters[index].bigH, _proposal.voters[index].p, _proposal.voters[index].y, _proposal.voters[index].z, _proposal.voters[index].s, _proposal.voters[index].c);
+    function getVote(uint index) external constant returns (address voter, string ciphertext, string proof) {
+        return (_proposal.voters[index].voter, _proposal.voters[index].ciphertext, _proposal.voters[index].proof);
     }
 
     /**

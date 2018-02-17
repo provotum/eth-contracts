@@ -24,11 +24,11 @@ contract ZeroKnowledgeVerificator {
     /**
      * @dev Verify the zero-knowledge proof of the given vote.
      *
-     * @param vote The vote to verify.
+     * @param proof A string representing the proof.
      *
      * @return True, if the vote has been verified successfully, false otherwise.
      */
-    function verifyProof(uint8 vote) external returns (bool) {
+    function verifyProof(string proof) external returns (bool) {
         // TODO: verify proof
         ProofEvent(msg.sender, true, "Proof was successful");
 
