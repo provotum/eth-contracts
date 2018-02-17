@@ -22,6 +22,7 @@ contract Ballot {
         address voter;
         string ciphertext;
         string proof;
+        bytes random;
     }
 
     struct Proposal {
@@ -81,10 +82,11 @@ contract Ballot {
      *
      * @param ciphertext   The ciphertext, i.e. a string representing (G, H)
      * @param proof        The corresponding membership proof.
+     * @param random       The random number used in the ciphertext. Note, this value is encrypted.
      *
      * @return bool, string True if vote is accepted, false otherwise, along with the reason why.
      */
-    function vote(string ciphertext, string proof) external returns (bool, string) {
+    function vote(string ciphertext, string proof, bytes random) external returns (bool, string) {
         // check whether voting is still allowed
         if (!_votingIsOpen) {
             VoteEvent(msg.sender, false, "Voting is closed");
@@ -105,7 +107,7 @@ contract Ballot {
         }
 
         _proposal.voted[msg.sender] = true;
-        _proposal.voters.push(Voter({voter : msg.sender, ciphertext : ciphertext, proof : proof}));
+        _proposal.voters.push(Voter({voter : msg.sender, ciphertext : ciphertext, proof : proof, random : random}));
 
         _proposal.nrVoters += 1;
 
@@ -138,9 +140,10 @@ contract Ballot {
      * @return voter        The address of the voter.
      * @return ciphertext   The ciphertext.
      * @return proof        The proof.
+     * @return random       The random value used in the ciphertext. Note, that this value is encrypted.
      */
-    function getVote(uint index) external constant returns (address voter, string ciphertext, string proof) {
-        return (_proposal.voters[index].voter, _proposal.voters[index].ciphertext, _proposal.voters[index].proof);
+    function getVote(uint index) external constant returns (address voter, string ciphertext, string proof, bytes random) {
+        return (_proposal.voters[index].voter, _proposal.voters[index].ciphertext, _proposal.voters[index].proof, _proposal.voters[index].random);
     }
 
     /**
