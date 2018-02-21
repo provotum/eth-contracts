@@ -1,14 +1,12 @@
-var Ballot = artifacts.require("./Ballot.sol");
-var ZeroKnowledgeVerificator = artifacts.require("./ZeroKnowledgeVerificator.sol");
+var Proxy = artifacts.require("./Proxy.sol");
 
 module.exports = function (deployer, network, accounts) {
-    deployer.deploy(ZeroKnowledgeVerificator);
 
-    deployer.then(function () {
-        return ZeroKnowledgeVerificator.new();
-    }).then(function (zkVerificator) {
-        deployer.link(ZeroKnowledgeVerificator, Ballot);
+  // deploy the proxy contract only
+  deployer.deploy(Proxy);
 
-        deployer.deploy(Ballot, 'Do you agree?', zkVerificator.address);
-    });
+  deployer.then(function () {
+    // do not delete this line. It is used in the setup script for grepping the proxy's address.
+    console.log("Proxy contract is deployed at " + Proxy.address);
+  });
 };
