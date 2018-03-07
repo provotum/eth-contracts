@@ -32,11 +32,19 @@ contract Ballot {
         string question;
     }
 
+    struct SumProof {
+        uint sum;
+        string ciphertext;
+        string proof;
+    }
+
     address private _owner;
 
     bool private _votingIsOpen;
 
     Proposal private _proposal;
+
+    SumProof private _sumProof;
 
 
     ZeroKnowledgeVerificator _zkVerificator;
@@ -114,6 +122,26 @@ contract Ballot {
         VoteEvent(msg.sender, true, "Accepted vote");
 
         return (true, "Accepted vote");
+    }
+
+    /**
+     * @param sum The cleartext sum of all votes, i.e. the cleartext result of the addition of all submitted votes.
+     * @param ciphertext The ciphertext containing the encrypted sum as result of the addition of all submitted votes.
+     * @param proof The corresponding proof, ensuring that the ciphertext actually contains the sum.
+     */
+    function setSumProof(uint sum, string ciphertext, string proof) public {
+        _sumProof = SumProof({sum : sum, ciphertext : ciphertext, proof : proof});
+    }
+
+    /**
+     * @return sum The cleartext sum of all votes, i.e. the cleartext result of the addition of all submitted votes.
+     * @return ciphertext The ciphertext containing the encrypted sum as result of the addition of all submitted votes.
+     * @return proof The corresponding proof, ensuring that the ciphertext actually contains the sum.
+     */
+    function getSumProof() public constant returns (uint sum, string ciphertext, string proof) {
+        sum = _sumProof.sum;
+        ciphertext = _sumProof.ciphertext;
+        proof = _sumProof.proof;
     }
 
     /**
