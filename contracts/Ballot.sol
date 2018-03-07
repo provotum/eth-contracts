@@ -129,7 +129,7 @@ contract Ballot {
      * @param ciphertext The ciphertext containing the encrypted sum as result of the addition of all submitted votes.
      * @param proof The corresponding proof, ensuring that the ciphertext actually contains the sum.
      */
-    function setSumProof(uint sum, string ciphertext, string proof) public {
+    function setSumProof(uint sum, string ciphertext, string proof) public onlyOwner {
         _sumProof = SumProof({sum : sum, ciphertext : ciphertext, proof : proof});
     }
 
